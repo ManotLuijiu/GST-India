@@ -12,7 +12,7 @@ def generate_irn(**kwargs):
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
-        gst_round_off = frappe.get_value('GST Settings','round_off_gst_values')
+        gst_round_off = frappe.db.get_single_value('GST Settings','round_off_gst_values')
         #add batch
         for row in invoice.items:
             item_list.append(get_dict('Item',row.item_code))
@@ -52,7 +52,8 @@ def create_irn_request(data,inv):
 
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
-            "POST", url, headers=headers, data=payload) 
+            "POST", url, headers=headers, data=payload)
+        
         response = response.json()['message']
         if response.get('error'):
             return error_response(response.get('error'))
